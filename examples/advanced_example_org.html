@@ -37,8 +37,8 @@
       }
     </style>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script src="data.json"></script>
     <script type="text/javascript" src="../src/markerclusterer.js"></script>
     <script>
       var styles = [[{
@@ -117,39 +117,6 @@
       var imageUrl = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&' +
           'chco=FFFFFF,008CFF,000000&ext=.png';
 
-      function getMap(page,markerImage,markerClusterer) {
-        var markerImage = new google.maps.MarkerImage(imageUrl,
-                new google.maps.Size(24, 32));
-        var url = '/examples/json.php?page=' + page;
-        $.ajax({
-          url: url,
-          type: "GET",
-          success: function( data ) {
-            console.log(page)
-              $.each(data.data, function (i, v) {
-                var latLng = new google.maps.LatLng(v.latitude, v.longitude);
-                var marker = new google.maps.Marker({
-                  position: latLng,
-                  draggable: true,
-                  icon: markerImage
-                });
-                //markers.push(marker);
-                markerClusterer.addMarker(marker);
-              });
-            if (data.hasNext) {
-              //console.log(markers)
-              page++;
-              getMap(page, markerImage, markerClusterer)
-            }
-          },
-          fail: function(jqXHR, textStatus, errorThrown){
-            console.log('networkErr');
-            hasNext = false;
-          }
-
-        });
-      }
-
       function refreshMap() {
         if (markerClusterer) {
           markerClusterer.clearMarkers();
@@ -157,29 +124,10 @@
 
         var markers = [];
 
-        var zoom = parseInt(document.getElementById('zoom').value, 10);
-        var size = parseInt(document.getElementById('size').value, 10);
-        var style = parseInt(document.getElementById('style').value, 10);
-        zoom = zoom === -1 ? null : zoom;
-        size = size === -1 ? null : size;
-        style = style === -1 ? null : style;
-
         var markerImage = new google.maps.MarkerImage(imageUrl,
           new google.maps.Size(24, 32));
 
-        var page = 1;
-        markerClusterer = new MarkerClusterer(map, markers, {
-          maxZoom: zoom,
-          gridSize: size,
-          styles: styles[style],
-          imagePath: '../images/m'
-        });
-        getMap(page,markerImage,markerClusterer);
-
-
-
-
-        /*for (var i = 0; i < 1000; ++i) {
+        for (var i = 0; i < 1000; ++i) {
           var latLng = new google.maps.LatLng(data.photos[i].latitude,
               data.photos[i].longitude)
           var marker = new google.maps.Marker({
@@ -188,10 +136,21 @@
             icon: markerImage
           });
           markers.push(marker);
-          //markers.push(marker);
+        }
 
-        }*/
+        var zoom = parseInt(document.getElementById('zoom').value, 10);
+        var size = parseInt(document.getElementById('size').value, 10);
+        var style = parseInt(document.getElementById('style').value, 10);
+        zoom = zoom === -1 ? null : zoom;
+        size = size === -1 ? null : size;
+        style = style === -1 ? null: style;
 
+        markerClusterer = new MarkerClusterer(map, markers, {
+          maxZoom: zoom,
+          gridSize: size,
+          styles: styles[style],
+          imagePath: '../images/m'
+        });
       }
 
       function initialize() {
